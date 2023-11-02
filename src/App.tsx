@@ -1,9 +1,17 @@
+import ImageCard from "./components/pages/Homepage/ImageCard/ImageCard"
+import { imageData } from "./contents/imageData"
+
+
 function App() {
 
 
   return (
     <>
-      <p className="text-5xl">Tailwind Test</p>
+     <div>
+     {
+        imageData?.map(image => <ImageCard key={image.id} imageInfo={image} />)
+      }
+     </div>
     </>
   )
 }
