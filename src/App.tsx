@@ -1,14 +1,20 @@
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { imageData } from "./contents/imageData";
+
 import ImageCard from "./components/pages/Homepage/ImageCard/ImageCard";
 import { useState } from "react";
 import ImageFileUploader from "./components/ui/ImageFileUploader";
+import { imageData } from "./contents/imageData";
+
+interface ImageInfo {
+  id: string;
+  img: string;
+  selected: boolean; // Added 'selected' property
+}
 
 function App() {
-  // State to store the list of images in the gallery
-  const [images, setImages] = useState(imageData);
-  // Function to handle the drag-and-drop functionality for images
+  const [images, setImages] = useState<ImageInfo[]>(imageData); // Specify the type for 'images'
+
   const moveImage = (dragIndex: number, hoverIndex: number) => {
     const draggedImage = images[dragIndex];
     const updatedImages = [...images];
@@ -16,29 +22,72 @@ function App() {
     updatedImages.splice(hoverIndex, 0, draggedImage);
     setImages(updatedImages);
   };
-  // Function to handle the image upload
+
+  const handleImageSelection = (id: string) => {
+    const updatedImages = images.map((image) => {
+      if (image.id === id) {
+        return { ...image, selected: !image.selected };
+      }
+      return image;
+    });
+    setImages(updatedImages);
+  };
+
+  const countSelectedImages = () => {
+    return images.filter((image) => image.selected).length;
+  };
+
+  const deleteSelectedImages = () => {
+    const updatedImages = images.filter((image) => !image.selected);
+    setImages(updatedImages);
+  };
+
   const handleUpload = (uploadedImage: File | Blob | null) => {
-    // Add the uploaded image to the gallery
-    setImages((prevImages: Array<{ id: string; img: string }>) => [
+    setImages((prevImages) => [
       ...prevImages,
-      { id: Date.now().toString(), img: URL.createObjectURL(uploadedImage!) },
+      {
+        id: Date.now().toString(),
+        img: URL.createObjectURL(uploadedImage!),
+        selected: false,
+      },
     ]);
+  };
+
+  const handleCountCheckbox = () => {
+    // Check if any images are selected
+    const anySelected = images.some((image) => image.selected);
+
+    // If any images are selected, unselect them all
+    if (anySelected) {
+      const updatedImages = images.map((image) => {
+        return { ...image, selected: false };
+      });
+      setImages(updatedImages);
+    }
   };
 
   return (
     <DndProvider backend={HTML5Backend}>
-      {/* 
-    DndProvider is a higher-order component from the 'react-dnd' library
-    that provides drag-and-drop functionality to child components.
-    It requires a 'backend' to handle the actual drag-and-drop behavior.
-    In this case, we're using the 'HTML5Backend' as the backend, which
-    is suitable for web applications.
-  */}
       <div className="max-w-4xl mx-auto rounded-lg shadow-md mt-10 bg-slate-50 border-slate-700">
         <div className="px-8">
           <div className="flex items-center justify-between border-b py-3">
-            <p className="text-xl font-bold mb-0">Image Gallery</p>
-            <button className="text-red-600 text-lg font-bold hover:text-red-700">
+            {countSelectedImages() ? (
+              <p className="text-xl font-bold mb-0">
+                <input
+                  onChange={handleCountCheckbox}
+                  type="checkbox"
+                  className="w-4 h-4"
+                  checked={countSelectedImages() > 0}
+                />{" "}
+                {countSelectedImages()} Files Selected
+              </p>
+            ) : (
+              <p className="text-xl font-bold mb-0">Image Gallery</p>
+            )}
+            <button
+              onClick={deleteSelectedImages}
+              className="text-red-600 text-lg font-bold hover:text-red-700"
+            >
               Delete files
             </button>
           </div>
@@ -49,6 +98,8 @@ function App() {
                 index={index}
                 id={image.id}
                 src={image.img}
+                selected={image.selected}
+                onImageSelect={handleImageSelection}
                 moveImage={moveImage}
                 className={index === 0 ? "col-span-2 row-span-2" : ""}
               />

@@ -3,9 +3,11 @@ import { useDrag, useDrop } from "react-dnd";
 // Define the props that this ImageCard component expects
 interface ImageCardProps {
   id: string;
-  index: number; // Index of the image in the gallery
+  index: number;
   src: string;
-  moveImage: (dragIndex: number, hoverIndex: number) => void; // Function to move images
+  selected: boolean; // New property to track selection
+  onImageSelect: (id: string) => void; // Function to handle image selection
+  moveImage: (dragIndex: number, hoverIndex: number) => void;
   className?: string;
 }
 
@@ -19,9 +21,13 @@ const ImageCard: React.FC<ImageCardProps> = ({
   id,
   index,
   src,
+  selected,
+  onImageSelect,
   moveImage,
   className,
 }) => {
+
+
   // Use the useDrag hook to enable dragging for this component
   const [, ref] = useDrag({
     type: "IMAGE", // Set the type of the item being dragged
@@ -41,6 +47,10 @@ const ImageCard: React.FC<ImageCardProps> = ({
     },
   });
 
+  
+  const handleCheckboxClick = () => {
+    onImageSelect(id); // Call the function to handle image selection
+  };
   // Render the ImageCard component with drag and drop functionality
   return (
     <div
@@ -54,12 +64,14 @@ const ImageCard: React.FC<ImageCardProps> = ({
         <div>
           <img src={src} alt={`Image ${id}`} /> {/* Display the image */}
         </div>
-        <div className="absolute inset-0 px-6 py-4 transition-opacity duration-200 bg-black overly-bg bg-opacity-50 opacity-0 hover:opacity-100 font-black">
-          <input
+        <div className={`absolute inset-0 px-6 py-4 transition-opacity duration-200 bg-black overly-bg   hover:opacity-100 font-black ${selected ? "bg-opacity-10" : "opacity-0 bg-opacity-50" }`}>
+        <input
             type="checkbox"
             id={id}
             name={`Image ${id}`}
             className="w-5 h-5"
+            checked={selected} // Set the checkbox state based on 'selected' property
+            onChange={handleCheckboxClick} // Call the function on checkbox click
           />
         </div>
       </div>
