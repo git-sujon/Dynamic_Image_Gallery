@@ -1,6 +1,6 @@
 # Dynamic Image Gallery
 
-
+![Gallery Preview](https://raw.githubusercontent.com/git-sujon/Simple_Image_Gallery/main/public/ss.png)
 
 Check out the live demo: [Dynamic Image Gallery Demo](https://dynamic-image-gallery.netlify.app/)
 

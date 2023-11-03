@@ -1,6 +1,7 @@
 import { DndProvider } from "react-dnd";
+import { TouchBackend } from "react-dnd-touch-backend";
 import { HTML5Backend } from "react-dnd-html5-backend";
-
+import { isMobile } from "react-device-detect";
 import ImageCard from "./components/pages/Homepage/ImageCard/ImageCard";
 import { useState } from "react";
 import ImageFileUploader from "./components/ui/ImageFileUploader";
@@ -11,6 +12,8 @@ interface ImageInfo {
   img: string;
   selected: boolean; // Added 'selected' property
 }
+console.log(isMobile)
+const backend = isMobile ? TouchBackend : HTML5Backend;
 
 function App() {
   const [images, setImages] = useState<ImageInfo[]>(imageData); // Specify the type for 'images'
@@ -67,7 +70,7 @@ function App() {
   };
 
   return (
-    <DndProvider backend={HTML5Backend}>
+    <DndProvider backend={backend}>
       <div className="max-w-4xl mx-auto rounded-lg shadow-md mt-10 bg-slate-50 border-slate-700">
         <div className="px-8">
           <div className="flex items-center justify-between border-b py-3">
